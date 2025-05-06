@@ -1,55 +1,61 @@
-Para listar 1000 itens em uma <ul><li> no Angular de forma performática, você deve considerar otimizações que minimizem o impacto no DOM e no processamento do Angular. Aqui estão as melhores práticas e a abordagem mais eficiente:
+<h2>Para listar 1000 itens no Angular de forma performática</h2>
 
-1. Use trackBy no *ngFor
-O Angular recria elementos do DOM quando a lista muda, mesmo que os itens sejam os mesmos. Usar a função trackBy no *ngFor ajuda o Angular a rastrear itens pelo seu identificador único, evitando recriações desnecessárias.
+<p>No Angular, você deve considerar otimizações que minimizem o impacto no DOM e no processamento do framework. Aqui estão as melhores práticas e a abordagem mais eficiente:</p>
 
-typescript
+<h3>1. Use <code>trackBy</code> no <code>*ngFor</code></h3>
+<p>O Angular recria elementos do DOM quando a lista muda, mesmo que os itens sejam os mesmos. Usar a função <code>trackBy</code> ajuda a rastrear os itens pelo seu identificador único, evitando recriações desnecessárias.</p>
 
-Copiar
+<h4>TypeScript</h4>
+<pre><code class="language-typescript">
 // No componente
 trackByFn(index: number, item: any): any {
   return item.id; // Use um identificador único, como um ID
 }
-html
+</code></pre>
 
-Copiar
+<h4>HTML</h4>
+<pre><code class="language-html">
 <ul>
   <li *ngFor="let item of items; trackBy: trackByFn">{{ item.name }}</li>
 </ul>
-Benefício: Reduz significativamente a manipulação do DOM, especialmente para listas grandes.
+</code></pre>
 
-2. Paginação ou Virtual Scroll
-Listar 1000 itens de uma vez pode ser pesado para o navegador, mesmo com otimizações. Considere:
+<p><strong>Benefício:</strong> Reduz significativamente a manipulação do DOM, especialmente para listas grandes.</p>
 
-Paginação: Exiba apenas uma parte dos dados por vez (ex.: 10-50 itens por página).
+<h3>2. Paginação ou Virtual Scroll</h3>
+<p>Listar 1000 itens de uma vez pode ser pesado para o navegador, mesmo com otimizações. Considere:</p>
 
-Use uma biblioteca como @ng-bootstrap/ng-bootstrap ou implemente manualmente com slice no array.
-typescript
+<ul>
+  <li><strong>Paginação:</strong> Exiba apenas uma parte dos dados por vez (ex.: 10-50 itens por página).</li>
+  <li><strong>Virtual Scroll:</strong> Renderize apenas os itens visíveis na tela com <code>@angular/cdk/scrolling</code>.</li>
+</ul>
 
-Copiar
+<h4>TypeScript - Paginação</h4>
+<pre><code class="language-typescript">
 itemsPage = this.items.slice(0, 50); // Primeiros 50 itens
-Virtual Scroll: Renderize apenas os itens visíveis na tela. Use o módulo @angular/cdk/scrolling.
+</code></pre>
 
-bash
-
-Copiar
+<h4>Instalação do CDK</h4>
+<pre><code class="language-bash">
 ng add @angular/cdk
-html
+</code></pre>
 
-Copiar
+<h4>HTML - Virtual Scroll</h4>
+<pre><code class="language-html">
 <cdk-virtual-scroll-viewport itemSize="50" style="height: 400px;">
   <ul>
     <li *cdkVirtualFor="let item of items; trackBy: trackByFn">{{ item.name }}</li>
   </ul>
 </cdk-virtual-scroll-viewport>
-Benefício: O cdkVirtualScroll renderiza apenas os itens na área visível, reduzindo drasticamente o número de elementos no DOM (ex.: apenas 20-30 itens em vez de 1000).
+</code></pre>
 
-3. Change Detection Strategy: OnPush
-Configure o componente para usar a estratégia de detecção de mudanças OnPush. Isso faz com que o Angular só atualize o componente quando as referências de entrada mudarem, evitando verificações desnecessárias.
+<p><strong>Benefício:</strong> O <code>cdkVirtualScroll</code> renderiza apenas os itens visíveis, reduzindo drasticamente o número de elementos no DOM (ex.: apenas 20-30 itens em vez de 1000).</p>
 
-typescript
+<h3>3. Change Detection Strategy: OnPush</h3>
+<p>Configure o componente para usar a estratégia de detecção de mudanças <code>OnPush</code>. Isso faz com que o Angular só atualize o componente quando as referências de entrada mudarem.</p>
 
-Copiar
+<h4>TypeScript</h4>
+<pre><code class="language-typescript">
 @Component({
   selector: 'app-list',
   templateUrl: './list.component.html',
@@ -58,4 +64,6 @@ Copiar
 export class ListComponent {
   @Input() items: any[] = [];
 }
-Benefício: Reduz verificações de mudança para listas grandes, melhorando a performance.
+</code></pre>
+
+<p><strong>Benefício:</strong> Reduz verificações de mudança para listas grandes, melhorando a performance.</p>
