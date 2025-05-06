@@ -1,0 +1,11 @@
+<cdk-virtual-scroll-viewport itemSize="60" style="height: 600px;">
+  <ul>
+    <li *cdkVirtualFor="let user of users; trackBy: trackByFn" class="user-item">
+      <span>{{ user.nome }}</span>
+      <span>Idade: {{ user.idade }}</span>
+      <span>País: {{ user.pais }}</span>
+      <span>Equipe: {{ user.equipe.nome }}</span>
+      <span>Status: {{ user.ativo ? 'Ativo' : 'Inativo' }}</span>
+    </li>
+  </ul>
+</cdk-virtual-scroll-viewport>

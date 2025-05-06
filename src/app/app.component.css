@@ -1,0 +1,19 @@
+cdk-virtual-scroll-viewport {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+  }
+  
+  .user-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    height: 60px;
+    line-height: 20px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .user-item span {
+    flex: 1;
+  }
