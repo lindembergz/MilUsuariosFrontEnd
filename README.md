@@ -1,59 +1,61 @@
-# UserListApp
+Para listar 1000 itens em uma <ul><li> no Angular de forma performática, você deve considerar otimizações que minimizem o impacto no DOM e no processamento do Angular. Aqui estão as melhores práticas e a abordagem mais eficiente:
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.4.
+1. Use trackBy no *ngFor
+O Angular recria elementos do DOM quando a lista muda, mesmo que os itens sejam os mesmos. Usar a função trackBy no *ngFor ajuda o Angular a rastrear itens pelo seu identificador único, evitando recriações desnecessárias.
 
-## Development server
+typescript
 
-To start a local development server, run:
+Copiar
+// No componente
+trackByFn(index: number, item: any): any {
+  return item.id; // Use um identificador único, como um ID
+}
+html
 
-```bash
-ng serve
-```
+Copiar
+<ul>
+  <li *ngFor="let item of items; trackBy: trackByFn">{{ item.name }}</li>
+</ul>
+Benefício: Reduz significativamente a manipulação do DOM, especialmente para listas grandes.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+2. Paginação ou Virtual Scroll
+Listar 1000 itens de uma vez pode ser pesado para o navegador, mesmo com otimizações. Considere:
 
-## Code scaffolding
+Paginação: Exiba apenas uma parte dos dados por vez (ex.: 10-50 itens por página).
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Use uma biblioteca como @ng-bootstrap/ng-bootstrap ou implemente manualmente com slice no array.
+typescript
 
-```bash
-ng generate component component-name
-```
+Copiar
+itemsPage = this.items.slice(0, 50); // Primeiros 50 itens
+Virtual Scroll: Renderize apenas os itens visíveis na tela. Use o módulo @angular/cdk/scrolling.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+bash
 
-```bash
-ng generate --help
-```
+Copiar
+ng add @angular/cdk
+html
 
-## Building
+Copiar
+<cdk-virtual-scroll-viewport itemSize="50" style="height: 400px;">
+  <ul>
+    <li *cdkVirtualFor="let item of items; trackBy: trackByFn">{{ item.name }}</li>
+  </ul>
+</cdk-virtual-scroll-viewport>
+Benefício: O cdkVirtualScroll renderiza apenas os itens na área visível, reduzindo drasticamente o número de elementos no DOM (ex.: apenas 20-30 itens em vez de 1000).
 
-To build the project run:
+3. Change Detection Strategy: OnPush
+Configure o componente para usar a estratégia de detecção de mudanças OnPush. Isso faz com que o Angular só atualize o componente quando as referências de entrada mudarem, evitando verificações desnecessárias.
 
-```bash
-ng build
-```
+typescript
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Copiar
+@Component({
+  selector: 'app-list',
+  templateUrl: './list.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class ListComponent {
+  @Input() items: any[] = [];
+}
+Benefício: Reduz verificações de mudança para listas grandes, melhorando a performance.
